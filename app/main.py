@@ -7,12 +7,16 @@ def move_file(command: str):
         return
     _, src_path, dest_path = tokens
 
-    if dest_path.endswith(os.path.sep):
+    if dest_path.endswith(("/", os.path.sep)):
         dest = os.path.join(dest_path, os.path.basename(src_path))
     else:
         dest = dest_path
-    parent_dir = os.path.dirname(dest)
-    os.makedirs(parent_dir, exist_ok=True)
+    dirs = dest.split("/")[:-1]
+    current = ""
+    for folder in dirs:
+        current += folder + "/"
+        if not os.path.exists(current):
+            os.mkdir(current)
     with open (src_path, "r") as src_file:
         content = src_file.read()
         with open (dest, "w") as dest_file:
