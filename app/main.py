@@ -2,26 +2,19 @@ import os
 
 
 def move_file(command: str):
-    lista = command.split()
-    if lista[0] != "mv" :
+    tokens = command.split()
+    if len(tokens) != 3 or tokens[0] != "mv" :
         return
-    current_file_name = lista[1]
-    dest_path = lista[2]
+    _, src_path, dest_path = tokens
 
-    if dest_path[-1] == "/":
-        new_file_name = current_file_name.split("/")[-1]
-        dest = dest_path + new_file_name
+    if dest_path.endswith(os.path.sep):
+        dest = os.path.join(dest_path, os.path.basename(src_path))
     else:
         dest = dest_path
-    dirs = dest.split("/")[:-1]
-    current = ""
-    for d in dirs:
-        current += d + "/"
-        if not os.path.exists(current):
-            os.mkdir(current)
-
-    with open (current_file_name, "r") as file:
-        content = file.read()
-        with open (dest, "w") as file_new:
-            file_new.write(content)
-    os.remove(current_file_name)
+    parent_dir = os.path.dirname(dest)
+    os.makedirs(parent_dir, exist_ok=True)
+    with open (src_path, "r") as src_file:
+        content = src_file.read()
+        with open (dest, "w") as dest_file:
+            dest_file.write(content)
+    os.remove(src_path)
